@@ -5,10 +5,14 @@ function destroy (reviewId) {
 }
 
 async function update (newBody) {
-    const newReview = await knex("reviews")
+    await knex("reviews")
         .select("*")
         .where({ review_id: newBody.review_id })
-        .update(newBody, "*")
+        .update(newBody, "*");
+
+    const newReview = await knex("reviews")
+        .select("*")
+        .where({ review_id: Number(newBody.review_id) })
         .then((val) => val[0]);
 
     const critic = await knex("critics as c")

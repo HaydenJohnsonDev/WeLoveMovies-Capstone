@@ -5,7 +5,9 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 async function list (req, res) {
     const methodName = "list";
     req.log.debug({ __filename, methodName });
+
     let {is_showing} = req.query;
+    
     if (is_showing) {
         const data = await service.list(true);
         res.status(200).json({ data: data });
@@ -18,20 +20,30 @@ async function list (req, res) {
 }
 
 async function movieExists (req, res, next) {
+    const methodName = "movieExists";
+    req.log.debug({ __filename, methodName });
+
     const error = { status: 404, message: `Movie cannot be found.`}
     const { movieId } = req.params;
 
-    if (!movieId) return next(error)
+    if (!movieId) {
+        req.log.trace({ __filename, methodName, return: false }, error.message);
+        return next(error)
+    }
 
     const movie = await db("movies").where({ movie_id: movieId }).first();
-    if (!movie) return next(error);
+    if (!movie) {
+        req.log.trace({ __filename, methodName, return: false }, error.message);
+        return next(error)
+    };
 
-    res.locals.movie = movie; 
+    res.locals.movie = movie;
+    req.log.trace({ __filename, methodName, return: true }); 
     next();
 }
 
 function read (req, res) {
-    const methodName = "list";
+    const methodName = "read";
     req.log.debug({ __filename, methodName, params: req.params });
 
     const movie = res.locals.movie;
@@ -41,7 +53,7 @@ function read (req, res) {
 }
 
 async function readReviews (req, res) {
-    const methodName = "list";
+    const methodName = "readReviews";
     req.log.debug({ __filename, methodName, params: req.params });
 
     const reviewData = await service.readReviews(req.params.movieId);
@@ -60,7 +72,7 @@ async function readReviews (req, res) {
 }
 
 async function readTheaters (req, res) {
-    const methodName = "list";
+    const methodName = "readTheaters";
     req.log.debug({ __filename, methodName, params: req.params });
 
     const data = await service.readTheaters(req.params.movieId);
