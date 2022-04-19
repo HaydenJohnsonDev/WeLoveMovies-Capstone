@@ -2,13 +2,14 @@ const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const service = require("./reviews.service");
 const db = require("../db/connection");
 
+// Validation middleware to check if a review exists in the database.
 async function reviewExists (req, res, next) {
     const methodName = "reviewExists";
     req.log.debug({ __filename, methodName, params: req.params });
 
     const error = {status: 404, message: "Review cannot be found."};
     const { reviewId } = req.params;
-    
+
     const review = await db("reviews").where({ review_id: reviewId }).first();
     if (!review) {
         req.log.trace({ __filename, methodName, return: false }, error.message);
@@ -19,6 +20,7 @@ async function reviewExists (req, res, next) {
     next();
 }
 
+// DELETE with params 'reviewId' - deletes an existing review from the database.
 async function destroy (req, res) {
     const methodName = "destroy";
     req.log.debug({ __filename, methodName, params: req.params });
@@ -29,6 +31,7 @@ async function destroy (req, res) {
     req.log.trace({ __filename, methodName, return: true });
 }
 
+// PUT with params 'reviewId' - updates an existing review from the database.
 async function update (req, res) {
     const methodName = "update";
     req.log.debug({ __filename, methodName, params: req.params, body: req.body });

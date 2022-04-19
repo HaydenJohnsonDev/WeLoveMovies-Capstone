@@ -2,12 +2,13 @@ const service = require("./movies.service");
 const db = require("../db/connection");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
+// GET - list all movies / GET with query 'is_showing' - list all movies with is_showing = true.
 async function list (req, res) {
     const methodName = "list";
     req.log.debug({ __filename, methodName });
 
     let {is_showing} = req.query;
-    
+
     if (is_showing) {
         const data = await service.list(true);
         res.status(200).json({ data: data });
@@ -19,6 +20,7 @@ async function list (req, res) {
     }
 }
 
+// Validation middleware to check if a movie is included in the database.
 async function movieExists (req, res, next) {
     const methodName = "movieExists";
     req.log.debug({ __filename, methodName });
@@ -42,6 +44,7 @@ async function movieExists (req, res, next) {
     next();
 }
 
+// GET with param 'movieId' - gets a specified movie.
 function read (req, res) {
     const methodName = "read";
     req.log.debug({ __filename, methodName, params: req.params });
@@ -52,6 +55,7 @@ function read (req, res) {
     req.log.trace({ __filename, methodName, return: true, movie });
 }
 
+// GET with params 'movieId' and 'reviews' - gets reviews for specified movie.
 async function readReviews (req, res) {
     const methodName = "readReviews";
     req.log.debug({ __filename, methodName, params: req.params });
@@ -71,6 +75,7 @@ async function readReviews (req, res) {
     req.log.trace({ __filename, methodName, return: true, data });
 }
 
+// GET with params 'movieId' and 'theaters' - gets all theaters showing specified movie.
 async function readTheaters (req, res) {
     const methodName = "readTheaters";
     req.log.debug({ __filename, methodName, params: req.params });
